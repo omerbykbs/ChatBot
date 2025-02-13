@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #chatbox { width: 50%; margin: auto; text-align: left; border: 1px solid #ccc; padding: 10px; }
+        .user { color: blue; font-weight: bold; }
+        .bot { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Chatbot</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Ask me something..." autofocus>
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        async function sendMessage() {
+            const userQuery = document.getElementById("userInput").value;
+            if (!userQuery.trim()) return;
+
+            document.getElementById("chatbox").innerHTML += `<p class="user">You: ${userQuery}</p>`;
+            document.getElementById("userInput").value = "";
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: userQuery })
+                });
+
+                const data = await response.json();
+                if (data.response) {
+                    document.getElementById("chatbox").innerHTML += `<p class="bot">Bot: ${data.response}</p>`;
+                } else {
+                    document.getElementById("chatbox").innerHTML += `<p class="bot">Error: No response received.</p>`;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("chatbox").innerHTML += `<p class="bot">Error: Unable to reach chatbot.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
