@@ -1,0 +1,8 @@
+flask
+flask_cors
+openai
+langchain
+langchain-community
+langchain_openai
+fastapi
+langserve

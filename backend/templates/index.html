@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-container { width: 400px; margin: 20px auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+        #chat-box { height: 300px; overflow-y: auto; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .message { margin: 5px 0; }
+        .user { text-align: right; color: blue; }
+        .bot { text-align: left; color: green; }
+        input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    async function sendMessage() {
+        const userInput = document.getElementById("user-input").value;
+        if (!userInput.trim()) return;
+    
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div class="message user">You: ${userInput}</div>`;
+        document.getElementById("user-input").value = "";
+    
+        try {
+            const response = await fetch("http://127.0.0.1:5000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    session_id: "user1",
+                    query: userInput
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log("API Response:", data);  // Debugging
+            chatBox.innerHTML += `<div class="message bot">Bot: ${data.response}</div>`;
+        } catch (error) {
+            console.error("Fetch error:", error);
+            chatBox.innerHTML += `<div class="message bot">Bot: Error occurred</div>`;
+        }
+    }
+    
+</script>
+
+</body>
+</html>
